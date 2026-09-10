@@ -39,6 +39,6 @@ class InvalidQuantityError(InventoryError):
 
 """Raised when the app cannot connect to the PostgreSQL database."""
 class DatabaseConnectionError(InventoryError):
-    pass
+     pass
     
 
