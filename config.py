@@ -1,6 +1,5 @@
 """
-Loads database configuration from environment variables (via a local
-.env file that is NOT committed to GitHub -- see .gitignore).
+Loads database configuration from environment variables
 This keeps secrets (passwords) out of source control while still
 letting every other file simply do `from config import DB_CONFIG`.
 """
