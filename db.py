@@ -66,22 +66,18 @@ class Database:
 
         return self.cur.fetchone()[0]
 
-    def add_product(self, name, category, price, quantity):
-        """Insert a new product row. Returns the new product's id."""
-
-        category_id = self.get_or_create_category(category)
-
-        self.cur.execute(
-            """INSERT INTO products
-               (name, category_id, price, quantity)
-               VALUES (%s, %s, %s, %s)
-               RETURNING id;""",
-            (name, category_id, price, quantity),
-        )
-
-        self.conn.commit()
-
-        return self.cur.fetchone()[0]
+    def add_product(self, name, category, price, quantity, expiry_date=None):
+     """Insert a new product row. Returns the new product's id."""
+     category_id = self.get_or_create_category(category)
+     self.cur.execute(
+        """INSERT INTO products
+           (name, category_id, price, quantity, expiry_date)
+           VALUES (%s, %s, %s, %s, %s)
+           RETURNING id;""",
+        (name, category_id, price, quantity, expiry_date),
+    )
+     self.conn.commit()
+     return self.cur.fetchone()[0]
 
     def update_stock(self, product_id, new_quantity):
         """Set a product's quantity directly. Raises if the id doesn't exist."""
@@ -113,12 +109,12 @@ class Database:
         """Fetch a single product row joined with category name, or None."""
 
         self.cur.execute(
-            """SELECT p.id, p.name, c.name, p.price, p.quantity
-               FROM products p
-               JOIN categories c ON p.category_id = c.id
-               WHERE p.id = %s;""",
-            (product_id,),
-        )
+        """SELECT p.id, p.name, c.name, p.price, p.quantity, p.expiry_date
+           FROM products p
+           JOIN categories c ON p.category_id = c.id
+           WHERE p.id = %s;""",
+           (product_id,),
+         )
 
         return self.cur.fetchone()
 
@@ -126,11 +122,11 @@ class Database:
         """Fetch every product row, joined with category name."""
 
         self.cur.execute(
-            """SELECT p.id, p.name, c.name, p.price, p.quantity
-               FROM products p
-               JOIN categories c ON p.category_id = c.id
-               ORDER BY p.id;"""
-        )
+        """SELECT p.id, p.name, c.name, p.price, p.quantity, p.expiry_date
+           FROM products p
+           JOIN categories c ON p.category_id = c.id
+           ORDER BY p.id;"""
+         )
 
         return self.cur.fetchall()
 
@@ -138,11 +134,11 @@ class Database:
         """Case-insensitive search of product names."""
 
         self.cur.execute(
-            """SELECT p.id, p.name, c.name, p.price, p.quantity
-               FROM products p
-               JOIN categories c ON p.category_id = c.id
-               WHERE p.name ILIKE %s;""",
-            (f"%{keyword}%",),
+        """SELECT p.id, p.name, c.name, p.price, p.quantity, p.expiry_date
+           FROM products p
+           JOIN categories c ON p.category_id = c.id
+           WHERE p.name ILIKE %s;""",
+           (f"%{keyword}%",),
         )
 
         return self.cur.fetchall()

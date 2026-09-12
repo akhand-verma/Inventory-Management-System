@@ -3,6 +3,7 @@ A simple terminal menu for the Inventory Management System.
 Demonstrates non-trivial control flow (a menu loop with branching
 and nested validation) and exception handling around user input.
 """
+from datetime import datetime
 import reports
 from db import Database
 from inventory import Inventory
@@ -55,12 +56,19 @@ def main():
 
             try:
                 if choice == "1":
-                    name = input("Name: ")
-                    category = input("Category: ")
-                    price = prompt_float("Price: ")
-                    qty = prompt_int("Quantity: ")
-                    pid = inv.add_product(name, category, price, qty)
-                    print(f"Added product #{pid}.")
+                  name = input("Name: ")
+                  category = input("Category: ")
+                  price = prompt_float("Price: ")
+                  qty = prompt_int("Quantity: ")
+                  expiry_input = input("Expiry date (YYYY-MM-DD, leave blank if not perishable): ").strip()
+                  expiry_date = None
+                  if expiry_input:
+                    try:
+                          expiry_date = datetime.strptime(expiry_input, "%Y-%m-%d").date()
+                    except ValueError:
+                         print("Invalid date format, saving without expiry.")
+                  pid = inv.add_product(name, category, price, qty, expiry_date)
+                  print(f"Added product #{pid}.")
 
                 elif choice == "2":
                     pid = prompt_int("Product id: ")
@@ -119,7 +127,7 @@ def main():
                 elif choice == "0":
                     print("𝔾𝕠𝕠𝕕𝕓𝕪𝕖!")
                     break  
-                              
+
                 else:
                     print("Invalid option, try again.")
 

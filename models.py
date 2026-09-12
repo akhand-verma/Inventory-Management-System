@@ -14,12 +14,13 @@ from exceptions import InvalidQuantityError
 
 
 
-"""
-Represents a single product/item in the shop's inventory.
-Attributes are encapsulated behind properties so that invalid
-values (negative price/quantity) can never be set directly.
-"""
+
 class Product:
+    """
+    Represents a single product/item in the shop's inventory.
+    Attributes are encapsulated behind properties so that invalid
+    values (negative price/quantity) can never be set directly.
+    """
     def __init__(self, name, category, price, quantity, product_id=None):
         self.id = product_id        
         self.name = name
@@ -30,9 +31,16 @@ class Product:
             
     @classmethod
     def from_row(cls, row):
-        """Build a Product from a (id, name, category, price, quantity) DB row."""
-        product_id, name, category, price, quantity = row
-        return cls(name, category, price, quantity, product_id)
+      """
+      Build the right kind of Product from a DB row:
+      (id, name, category, price, quantity, expiry_date).
+       Returns a PerishableProduct if the row has an expiry date,
+        otherwise a plain Product.
+      """
+      product_id, name, category, price, quantity, expiry_date = row
+      if expiry_date is not None:
+        return PerishableProduct(name, category, price, quantity, expiry_date, product_id)
+      return cls(name, category, price, quantity, product_id)
 
     # ---- encapsulated price ----
     @property
