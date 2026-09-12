@@ -19,17 +19,17 @@ class Inventory:
         self.db = db # a Database instance 
 
 
-    def add_product(self,name,category,price,quantity):
-        """
-        Add a brand-new product to the shop.
-        Returns: the new product's database id.
-        Raises: InvalidQuantityError if price/quantity are invalid.
-        """
-        if(price<0 or quantity<0):
-            raise InvalidQuantityError("Price and quantity must be >= 0.")
-        product_id = self.db.add_product(name,category,price,quantity)
-        self.db.log_transaction(product_id, "initial_stock", quantity)
-        return product_id
+    def add_product(self, name, category, price, quantity, expiry_date=None):
+      """
+      Add a brand-new product to the shop.
+      Returns: the new product's database id.
+      Raises: InvalidQuantityError if price/quantity are invalid.
+    """
+      if(price<0 or quantity<0):
+        raise InvalidQuantityError("Price and quantity must be >= 0.")
+      product_id = self.db.add_product(name, category, price, quantity, expiry_date)
+      self.db.log_transaction(product_id, "initial_stock", quantity)
+      return product_id
 
 
     def sell_product(self, product_id, quantity):
