@@ -137,3 +137,6 @@ def main():
 
     finally:
         db.close()
+
+        
+main()
