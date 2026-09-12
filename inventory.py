@@ -4,7 +4,7 @@ The Inventory class contains all the BUSINESS LOGIC of the shop
 Database instance for persistence, but never writes SQL itself --
 that separation keeps each class focused on one job.
 """
-
+from models import Product
 from exceptions import (
     InsufficientStockError,
     InvalidQuantityError,
@@ -89,13 +89,16 @@ class Inventory:
         to avoid duplicate category names when many low-stock items
         share a category).
         """
-        low_stock = [p for p in self.db.get_all_products() if p[4] <= threshold]
-        affected_categories = {p[2] for p in low_stock}  # set comprehension
+        products = [Product.from_row(row) for row in self.db.get_all_products()]
+        low_stock = [p for p in products if p.is_low_stock(threshold)]
+        affected_categories = {p.category for p in low_stock}
         return low_stock, affected_categories
 
+    
     def calculate_total_value(self):
         """Return the total monetary value (price * quantity) of all stock."""
-        return round(sum(p[3] * p[4] for p in self.db.get_all_products()), 2)
+        products = [Product.from_row(row) for row in self.db.get_all_products()]
+        return round(sum(p.total_value() for p in products), 2)
 
     def transaction_history(self):
         """Return the full audit log of sales/restocks."""

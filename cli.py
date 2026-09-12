@@ -3,7 +3,7 @@ A simple terminal menu for the Inventory Management System.
 Demonstrates non-trivial control flow (a menu loop with branching
 and nested validation) and exception handling around user input.
 """
-
+import reports
 from db import Database
 from inventory import Inventory
 from exceptions import InventoryError
@@ -20,6 +20,8 @@ MENU = """
 7. Low stock alerts
 8. Total inventory value
 9. Transaction history
+10. Category summary report
+11. Export report to CSV
 0. Exit
 """
 
@@ -102,10 +104,22 @@ def main():
                     for t in inv.transaction_history():
                         print(t)
 
+                elif choice == "10":
+                    df = reports.products_to_dataframe(inv.all_products())
+                    if df.empty:
+                        print("No products yet.")
+                    else:
+                        summary = reports.category_summary(df)
+                        print(summary)
+
+                elif choice == "11":
+                    df = reports.products_to_dataframe(inv.all_products())
+                    path = reports.export_to_csv(df, "data/inventory_report.csv")
+                    print(f"Report saved to {path}")
                 elif choice == "0":
                     print("𝔾𝕠𝕠𝕕𝕓𝕪𝕖!")
-                    break
-
+                    break  
+                              
                 else:
                     print("Invalid option, try again.")
 
