@@ -7,7 +7,7 @@ Also handles CSV export and a matplotlib chart.
 import pandas as pd
 import matplotlib.pyplot as plt
 
-PRODUCT_COLUMNS = ["id","name","category","price","quantity"]
+PRODUCT_COLUMNS = ["id", "name", "category", "price", "quantity", "expiry_date"]
 
 def products_to_dataframe(rows):
     """Convert raw (id, name, category, price, quantity) tuples to a DataFrame."""
