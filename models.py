@@ -25,7 +25,14 @@ class Product:
         self.name = name
         self.category = category
         self.price = price            
-        self.quantity = quantity     
+        self.quantity = quantity 
+
+            
+    @classmethod
+    def from_row(cls, row):
+        """Build a Product from a (id, name, category, price, quantity) DB row."""
+        product_id, name, category, price, quantity = row
+        return cls(name, category, price, quantity, product_id)
 
     # ---- encapsulated price ----
     @property
