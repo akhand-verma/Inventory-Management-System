@@ -6,6 +6,8 @@ Also handles CSV export and a matplotlib chart.
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
+
 
 PRODUCT_COLUMNS = ["id", "name", "category", "price", "quantity", "expiry_date"]
 
@@ -38,6 +40,7 @@ def top_products(df,n=5):
 
 def export_to_csv(df, path):
     """Write a DataFrame out to a CSV file for the shop owner to keep."""
+    os.makedirs(os.path.dirname(path), exist_ok=True)   # <-- add this line
     df.to_csv(path, index=False)
     return path
 

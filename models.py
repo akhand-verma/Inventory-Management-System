@@ -77,13 +77,14 @@ class Product:
 
 
 
-"""
-A Product that also has an expiry date (e.g. food, cosmetics).
-Demonstrates inheritance: reuses everything from Product but adds
-expiry-specific data and overrides is_low_stock() with an extra
-safety rule (treat expired stock as effectively "low/unusable").
-"""
+
 class PerishableProduct(Product):
+    """
+    A Product that also has an expiry date (e.g. food, cosmetics).
+    Demonstrates inheritance: reuses everything from Product but adds
+    expiry-specific data and overrides is_low_stock() with an extra
+    safety rule (treat expired stock as effectively "low/unusable").
+    """
     def __init__(self, name, category, price, quantity, expiry_date, product_id=None):
         super().__init__(name, category, price, quantity, product_id)
         self.expiry_date = expiry_date  # a datetime.date

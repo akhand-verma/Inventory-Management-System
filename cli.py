@@ -9,6 +9,8 @@ from db import Database
 from inventory import Inventory
 from exceptions import InventoryError
 from config import LOW_STOCK_THRESHOLD
+import os
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 MENU = """
 𝐼𝓃𝓋𝑒𝓃𝓉𝑜𝓇𝓎 𝑀𝒶𝓃𝒶𝑔𝑒𝓂𝑒𝓃𝓉 𝒮𝓎𝓈𝓉𝑒𝓂
@@ -122,12 +124,25 @@ def main():
 
                 elif choice == "11":
                     df = reports.products_to_dataframe(inv.all_products())
-                    path = reports.export_to_csv(df, "data/inventory_report.csv")
-                    print(f"Report saved to {path}")
+                    csv_path = os.path.join(DATA_DIR, "inventory_report.csv")
+                    chart_path = os.path.join(DATA_DIR, "inventory_by_category.png")
+                    if df.empty:
+                     for stale in (csv_path, chart_path):
+                        if os.path.exists(stale):
+                            os.remove(stale)
+                     print("No products yet. Cleared any old report/chart files.")
+                    else:
+                        path = reports.export_to_csv(df, csv_path)
+                        print(f"Report saved to {path}")
+
+                        summary = reports.category_summary(df)
+                        chart_path = reports.plot_stock_by_category(summary, chart_path)
+                        print(f"Chart saved to {chart_path}")
+
+
                 elif choice == "0":
                     print("𝔾𝕠𝕠𝕕𝕓𝕪𝕖!")
-                    break  
-
+                    break
                 else:
                     print("Invalid option, try again.")
 
