@@ -103,3 +103,7 @@ class Inventory:
     def transaction_history(self):
         """Return the full audit log of sales/restocks."""
         return self.db.get_transactions()
+
+    def transaction_details(self):
+        """Transactions with category and price attached (for charts)."""
+        return self.db.get_transactions_detailed()

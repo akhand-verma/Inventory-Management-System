@@ -166,3 +166,14 @@ class Database:
         )
 
         return self.cur.fetchall()
+
+    def get_transactions_detailed(self):
+        """Transactions joined with category + price, used for charts/reports."""
+        self.cur.execute(
+            """SELECT t.id, p.name, c.name, t.action, t.quantity, t.timestamp, p.price
+               FROM transactions t
+               JOIN products p ON t.product_id = p.id
+               JOIN categories c ON p.category_id = c.id
+               ORDER BY t.timestamp;"""
+        )
+        return self.cur.fetchall()

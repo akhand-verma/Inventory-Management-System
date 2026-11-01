@@ -10,7 +10,9 @@ from inventory import Inventory
 from exceptions import InventoryError
 from config import LOW_STOCK_THRESHOLD
 import os
+import glob
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+CHARTS_DIR = os.path.join(DATA_DIR, "charts")
 
 MENU = """
 𝐼𝓃𝓋𝑒𝓃𝓉𝑜𝓇𝓎 𝑀𝒶𝓃𝒶𝑔𝑒𝓂𝑒𝓃𝓉 𝒮𝓎𝓈𝓉𝑒𝓂
@@ -24,7 +26,7 @@ MENU = """
 8. Total inventory value
 9. Transaction history
 10. Category summary report
-11. Export report to CSV
+11. Export reports (CSV + charts)
 0. Exit
 """
 
@@ -124,22 +126,32 @@ def main():
 
                 elif choice == "11":
                     df = reports.products_to_dataframe(inv.all_products())
+                    tx_df = reports.transactions_to_dataframe(inv.transaction_details())
                     csv_path = os.path.join(DATA_DIR, "inventory_report.csv")
+                    tx_csv_path = os.path.join(DATA_DIR, "transactions_report.csv")
                     chart_path = os.path.join(DATA_DIR, "inventory_by_category.png")
+
                     if df.empty:
-                     for stale in (csv_path, chart_path):
-                        if os.path.exists(stale):
-                            os.remove(stale)
-                     print("No products yet. Cleared any old report/chart files.")
+                        old_files = [csv_path, tx_csv_path, chart_path]
+                        old_files += glob.glob(os.path.join(CHARTS_DIR, "*.png"))
+                        for stale in old_files:
+                            if os.path.exists(stale):
+                                os.remove(stale)
+                        print("No products yet. Cleared any old report/chart files.")
                     else:
                         path = reports.export_to_csv(df, csv_path)
                         print(f"Report saved to {path}")
+                        path = reports.export_to_csv(tx_df, tx_csv_path)
+                        print(f"Transactions saved to {path}")
 
                         summary = reports.category_summary(df)
                         chart_path = reports.plot_stock_by_category(summary, chart_path)
                         print(f"Chart saved to {chart_path}")
 
-
+                        charts = reports.generate_all_charts(df, tx_df, CHARTS_DIR, LOW_STOCK_THRESHOLD)
+                        print(f"{len(charts)} more charts saved in {CHARTS_DIR}:")
+                        for c in charts:
+                            print(f"  - {os.path.basename(c)}")
                 elif choice == "0":
                     print("𝔾𝕠𝕠𝕕𝕓𝕪𝕖!")
                     break
